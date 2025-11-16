@@ -119,13 +119,13 @@ END:VCALENDAR
         </button>
 
         {/* Add to Apple Calendar or Google Calendar */}
-        <button
-          onClick={handleAddToApple}
+        <a
+          href="/api/calendar"
           className="flex p-4 gap-2 items-center justify-center w-full sm:w-auto rounded-full cursor-pointer backdrop-blur-md shadow-xl border border-white/30 bg-white/10 hover:text-[#f0ad7a] hover:border-[#f0ad7a] hover:bg-[#f0ad7a]/5"
         >
           <CalendarPlusSolid className="w-6 h-6" />
           <span className="block sm:hidden">Add To Calendar</span>
-        </button>
+        </a>
       </div>
     </section>
   );
