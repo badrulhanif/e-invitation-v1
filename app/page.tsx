@@ -33,6 +33,28 @@ export default function Home() {
     }
   };
 
+  const handleAddToApple = () => {
+    const ics = `
+BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+DTSTART:20260815T140000
+DTEND:20260815T180000
+SUMMARY:Birthday Sayang
+LOCATION:Secret Location
+DESCRIPTION:A day crafted with intention, wrapped in mystery, and designed to sweep you off your feet.
+END:VEVENT
+END:VCALENDAR
+    `;
+    const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "birthday-sayang.ics";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   useEffect(() => {
     const handleClick = () => playAudio();
     window.addEventListener("click", handleClick, { once: true });
@@ -97,7 +119,10 @@ export default function Home() {
         </button>
 
         {/* Add to Apple Calendar or Google Calendar */}
-        <button className="flex p-4 gap-2 items-center justify-center w-full sm:w-auto rounded-full cursor-pointer backdrop-blur-md shadow-xl border border-white/30 bg-white/10 hover:text-[#f0ad7a] hover:border-[#f0ad7a] hover:bg-[#f0ad7a]/5">
+        <button
+          onClick={handleAddToApple}
+          className="flex p-4 gap-2 items-center justify-center w-full sm:w-auto rounded-full cursor-pointer backdrop-blur-md shadow-xl border border-white/30 bg-white/10 hover:text-[#f0ad7a] hover:border-[#f0ad7a] hover:bg-[#f0ad7a]/5"
+        >
           <CalendarPlusSolid className="w-6 h-6" />
           <span className="block sm:hidden">Add To Calendar</span>
         </button>
