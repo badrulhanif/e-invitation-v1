@@ -1,12 +1,58 @@
 "use client";
 
 import Image from "next/image";
+import {
+  CalendarPlusSolid,
+  SoundHighSolid,
+  SoundOffSolid,
+} from "iconoir-react";
+import { useEffect, useRef, useState } from "react";
 
+import { parisienne } from "@/config/font";
 import { Timer } from "@/components/ui/Timer";
 
 export default function Home() {
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [isMuted, setIsMuted] = useState(false);
+  const [hasPlayed, setHasPlayed] = useState(false);
+
+  const playAudio = () => {
+    if (audioRef.current && !hasPlayed) {
+      audioRef.current.volume = 0.5;
+      audioRef.current.muted = false;
+      audioRef.current.play().catch(() => {});
+      setHasPlayed(true);
+      setIsMuted(false);
+    }
+  };
+
+  const toggleMute = () => {
+    if (audioRef.current) {
+      audioRef.current.muted = !audioRef.current.muted;
+      setIsMuted(audioRef.current.muted);
+    }
+  };
+
+  useEffect(() => {
+    const handleClick = () => playAudio();
+    window.addEventListener("click", handleClick, { once: true });
+    return () => window.removeEventListener("click", handleClick);
+  }, [hasPlayed]);
+
   return (
-    <section className="flex flex-col gap-8 p-8 sm:p-16 w-full mx-auto max-w-4xl items-center justify-center text-white">
+    <section className="flex flex-col gap-8 p-8 sm:p-16 w-full mx-auto max-w-2xl items-center justify-center text-white">
+      <audio autoPlay loop ref={audioRef} src="/Audio/playback.mp3" />
+
+      <button
+        onClick={toggleMute}
+        className="fixed top-6 sm:top-8 right-6 sm:right-8 z-50 cursor-pointer"
+      >
+        {isMuted ? (
+          <SoundOffSolid className="w-6 h-6 text-[#f6caa9]/50 hover:text-[#f0ad7a]" />
+        ) : (
+          <SoundHighSolid className="w-6 h-6 hover:text-[#f0ad7a]" />
+        )}
+      </button>
       <div className="relative w-[40vh] h-[50vh] rounded-3xl overflow-hidden shadow-xl border border-white/10">
         <Image
           fill
@@ -19,7 +65,7 @@ export default function Home() {
           <Timer
             targetDate={new Date("2026-08-15T14:00:00")}
             render={(timeLeft) => {
-              if (!timeLeft) return "Birthday Sayang!";
+              if (!timeLeft) return "Celebration Day!";
               const dayText = timeLeft.days === 1 ? "Day" : "Days";
               return `${timeLeft.days} ${dayText} Left`;
             }}
@@ -32,15 +78,30 @@ export default function Home() {
         </div>
       </div>
       <div className="space-y-4 text-center">
-        <h2 className="text-4xl sm:text-6xl font-bold">Bonjour</h2>
+        <h2
+          className={`${parisienne.className} text-4xl sm:text-6xl italic font-bold`}
+        >
+          My Sweetest One
+        </h2>
         <p>
-          Lorem ipsum amet tu init marisa de la paris de espanyol bola en de
-          constant de papel
+          A day crafted with intention, wrapped in mystery, and designed to
+          sweep you off your feet.
+        </p>
+        <p className="italic text-white/50">
+          Every moment has been made just for you
         </p>
       </div>
-      <button className="p-4 w-full max-w-lg rounded-full cursor-pointer backdrop-blur-md shadow-xl border border-white/30 bg-white/10">
-        Title
-      </button>
+      <div className="flex flex-col sm:flex-row gap-4 w-full items-center justify-center">
+        <button className="p-4 w-full max-w-md rounded-full cursor-pointer backdrop-blur-md shadow-xl border border-white/30 bg-white/10 hover:text-[#f0ad7a] hover:border-[#f0ad7a] hover:bg-[#f0ad7a]/5">
+          I’m Coming, Sayang!
+        </button>
+
+        {/* Add to Apple Calendar or Google Calendar */}
+        <button className="flex p-4 gap-2 items-center justify-center w-full sm:w-auto rounded-full cursor-pointer backdrop-blur-md shadow-xl border border-white/30 bg-white/10 hover:text-[#f0ad7a] hover:border-[#f0ad7a] hover:bg-[#f0ad7a]/5">
+          <CalendarPlusSolid className="w-6 h-6" />
+          <span className="block sm:hidden">Add To Calendar</span>
+        </button>
+      </div>
     </section>
   );
 }
