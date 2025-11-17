@@ -41,8 +41,9 @@ END:VCALENDAR`;
   return new NextResponse(ics, {
     status: 200,
     headers: {
-      "Content-Type": "text/calendar; charset=utf-8",
+      "Content-Type": "application/octet-stream",
       "Content-Disposition": 'attachment; filename="birthday-sayang-2026.ics"',
+      "Cache-Control": "no-cache",
     },
   });
 }
