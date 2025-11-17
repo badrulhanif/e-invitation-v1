@@ -26,11 +26,11 @@ export function sendEmailTemplate() {
   
   <!-- Initiary schedule -->
   <ul style="list-style:none; padding:0; margin:8px 0; color:rgba(255,255,255,0.85); font-size:16px; line-height:1.6;">
-    <li style="margin:6px 0;">I will pick you up</li>
-    <li style="margin:6px 0;">We arrive at the venue</li>
-    <li style="margin:6px 0;">Eat & Celebration</li>
-    <li style="margin:6px 0;">Party & Funs</li>
-    <li style="margin:6px 0;">End of celebration / Drop off</li>
+    <li>I will pick you up</li>
+    <li>We arrive at the venue</li>
+    <li>Eat & Celebration</li>
+    <li>Party & Funs</li>
+    <li>End of celebration / Drop off</li>
   </ul>
 </div>
 
