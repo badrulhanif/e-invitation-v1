@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import {
-  CalendarPlusSolid,
+  AppleShortcutsSolid,
+  GoogleCircleSolid,
   SoundHighSolid,
   SoundOffSolid,
 } from "iconoir-react";
@@ -13,6 +14,7 @@ import { Timer } from "@/components/ui/Timer";
 
 export default function Home() {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [accepted, setAccepted] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
 
@@ -33,26 +35,9 @@ export default function Home() {
     }
   };
 
-  const handleAddToApple = () => {
-    const ics = `
-BEGIN:VCALENDAR
-VERSION:2.0
-BEGIN:VEVENT
-DTSTART:20260815T140000
-DTEND:20260815T180000
-SUMMARY:Birthday Sayang
-LOCATION:Secret Location
-DESCRIPTION:A day crafted with intention, wrapped in mystery, and designed to sweep you off your feet.
-END:VEVENT
-END:VCALENDAR
-    `;
-    const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "birthday-sayang.ics";
-    link.click();
-    URL.revokeObjectURL(url);
+  const handleAccept = () => {
+    setAccepted(true);
+    sessionStorage.setItem("sayangAccepted", "true");
   };
 
   useEffect(() => {
@@ -61,8 +46,15 @@ END:VCALENDAR
     return () => window.removeEventListener("click", handleClick);
   }, [hasPlayed]);
 
+  useEffect(() => {
+    const saved = sessionStorage.getItem("sayangAccepted");
+    if (saved === "true") {
+      setAccepted(true);
+    }
+  }, []);
+
   return (
-    <section className="flex flex-col gap-8 p-8 sm:p-16 w-full mx-auto max-w-2xl items-center justify-center text-white">
+    <section className="flex flex-col gap-8 p-8 sm:p-16 my-8 w-full mx-auto max-w-2xl items-center justify-center text-white">
       <audio autoPlay loop ref={audioRef} src="/Audio/playback.mp3" />
 
       <button
@@ -114,18 +106,35 @@ END:VCALENDAR
         </p>
       </div>
       <div className="flex flex-col sm:flex-row gap-4 w-full items-center justify-center">
-        <button className="p-4 w-full max-w-md rounded-full cursor-pointer backdrop-blur-md shadow-xl border border-white/30 bg-white/10 hover:text-[#f0ad7a] hover:border-[#f0ad7a] hover:bg-[#f0ad7a]/5">
-          I’m Coming, Sayang!
-        </button>
-
-        {/* Add to Apple Calendar or Google Calendar */}
-        <a
-          href="/api/calendar"
-          className="flex p-4 gap-2 items-center justify-center w-full sm:w-auto rounded-full cursor-pointer backdrop-blur-md shadow-xl border border-white/30 bg-white/10 hover:text-[#f0ad7a] hover:border-[#f0ad7a] hover:bg-[#f0ad7a]/5"
-        >
-          <CalendarPlusSolid className="w-6 h-6" />
-          <span className="block sm:hidden">Add To Calendar</span>
-        </a>
+        {!accepted ? (
+          <button
+            onClick={handleAccept}
+            className="p-4 w-full max-w-md rounded-full cursor-pointer backdrop-blur-md shadow-xl border border-white/30 bg-white/10 hover:text-[#f0ad7a] hover:border-[#f0ad7a] hover:bg-[#f0ad7a]/5"
+          >
+            I’m Coming, Baby!
+          </button>
+        ) : (
+          <div className="flex flex-col sm:flex-row gap-4 w-full items-center justify-center">
+            <a
+              href="/api/apple-calendar"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="flex p-4 gap-2 items-center justify-center w-full sm:w-auto rounded-full cursor-pointer backdrop-blur-md shadow-xl border border-white/30 bg-white/10 hover:text-[#f0ad7a] hover:border-[#f0ad7a] hover:bg-[#f0ad7a]/5"
+            >
+              <AppleShortcutsSolid className="w-6 h-6" />
+              <span>Add Apple Calendar</span>
+            </a>
+            <a
+              href="/api/google-calendar"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="flex p-4 gap-2 items-center justify-center w-full sm:w-auto rounded-full cursor-pointer backdrop-blur-md shadow-xl border border-white/30 bg-white/10 hover:text-[#f0ad7a] hover:border-[#f0ad7a] hover:bg-[#f0ad7a]/5"
+            >
+              <GoogleCircleSolid className="w-6 h-6" />
+              <span>Add Google Calendar</span>
+            </a>
+          </div>
+        )}
       </div>
     </section>
   );
