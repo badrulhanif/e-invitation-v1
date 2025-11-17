@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     siteName: "Birthday Sayang Celebration",
     images: [
       {
-        url: "https://e-invitation-v1.vercel.app/banner.jpg",
+        url: "https://e-invitation-v1.vercel.app/Images/banner.jpg",
         width: 1200,
         height: 630,
         alt: "Birthday Sayang Celebration",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     title: "Birthday Sayang Celebration",
     description:
       "A day of elegance, intimacy, and unforgettable moments — crafted just for you, sayang.",
-    images: ["https://e-invitation-v1.vercel.app/banner.jpg"],
+    images: ["https://e-invitation-v1.vercel.app//Images/banner.jpg"],
   },
 
   metadataBase: new URL("https://e-invitation-v1.vercel.app/"),
