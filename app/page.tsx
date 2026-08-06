@@ -6,37 +6,112 @@ import { useEffect, useRef, useState } from "react";
 import { parisienne } from "@/config/font";
 import { Timer } from "@/components/ui/Timer";
 
+const UNLOCK_EVENTS = [
+  "pointerdown",
+  "mousedown",
+  "touchstart",
+  "touchend",
+  "click",
+  "keydown",
+  "wheel",
+  "scroll",
+] as const;
+
 export default function Home() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isMuted, setIsMuted] = useState(false);
-  const [hasPlayed, setHasPlayed] = useState(false);
-
-  const playAudio = () => {
-    if (audioRef.current && !hasPlayed) {
-      audioRef.current.volume = 0.5;
-      audioRef.current.muted = false;
-      audioRef.current.play().catch(() => {});
-      setHasPlayed(true);
-      setIsMuted(false);
-    }
-  };
+  const isMutedRef = useRef(false);
 
   const toggleMute = () => {
-    if (audioRef.current) {
-      audioRef.current.muted = !audioRef.current.muted;
-      setIsMuted(audioRef.current.muted);
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const nextMuted = !audio.muted;
+    audio.muted = nextMuted;
+    isMutedRef.current = nextMuted;
+    setIsMuted(nextMuted);
+
+    if (!nextMuted && audio.paused) {
+      audio.play().catch(() => {});
     }
   };
 
   useEffect(() => {
-    const handleClick = () => playAudio();
-    window.addEventListener("click", handleClick, { once: true });
-    return () => window.removeEventListener("click", handleClick);
-  }, [hasPlayed]);
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    audio.loop = true;
+    audio.volume = 0.5;
+
+    let unlocked = false;
+
+    const removeUnlockListeners = () => {
+      UNLOCK_EVENTS.forEach((event) =>
+        window.removeEventListener(event, handleUnlock)
+      );
+    };
+
+    const tryPlay = async () => {
+      if (isMutedRef.current) return false;
+
+      audio.muted = false;
+      try {
+        await audio.play();
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
+    // Fallback: the browser blocked autoplay, so start on the first gesture.
+    function handleUnlock() {
+      if (unlocked) return;
+      void tryPlay().then((ok) => {
+        if (!ok) return;
+        unlocked = true;
+        removeUnlockListeners();
+      });
+    }
+
+    const addUnlockListeners = () => {
+      UNLOCK_EVENTS.forEach((event) =>
+        window.addEventListener(event, handleUnlock, { passive: true })
+      );
+    };
+
+    // Force autoplay on landing.
+    void tryPlay().then((ok) => {
+      if (ok) {
+        unlocked = true;
+        return;
+      }
+      addUnlockListeners();
+    });
+
+    // Resume if the tab was backgrounded or the OS paused playback.
+    const handleVisibility = () => {
+      if (document.visibilityState !== "visible") return;
+      if (isMutedRef.current || !audio.paused) return;
+      void tryPlay();
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      removeUnlockListeners();
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, []);
 
   return (
     <section className="flex flex-col gap-8 p-4 sm:py-16 my-8 sm:my-0 w-full mx-auto max-w-2xl items-center justify-center text-white">
-      <audio autoPlay loop ref={audioRef} src="/Audio/playback.mp3" />
+      <audio
+        autoPlay
+        loop
+        playsInline
+        preload="auto"
+        ref={audioRef}
+        src="/Audio/playback.mp3"
+      />
 
       <button
         onClick={toggleMute}
